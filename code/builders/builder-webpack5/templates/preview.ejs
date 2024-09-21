@@ -63,14 +63,23 @@
     <div id="storybook-docs"></div>
 
     <% if (typeof globals !== 'undefined' && Object.keys(globals).length) { %>
-    <script>
-      <% for (var varName in globals) { %>
-          <% if (globals[varName] != undefined) { %>
-            window['<%=varName%>'] = <%= JSON.stringify(globals[varName]) %>;
-          <% } %>
-      <% } %>
+    <script type="application/json" id="storybook-globals">
+      <%- JSON.stringify(globals) %>
     </script>
     <% } %>
+    <script>
+      (function() {
+        var globalsScript = document.getElementById('storybook-globals');
+        if (globalsScript) {
+          var globals = JSON.parse(globalsScript.textContent);
+          Object.keys(globals).forEach(function(key) {
+            if (globals[key] !== undefined) {
+              window[key] = globals[key];
+            }
+          });
+        }
+      })();
+    </script>
     <script type="module">
       import './sb-preview/runtime.js';
 
